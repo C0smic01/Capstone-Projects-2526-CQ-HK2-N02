@@ -11,13 +11,13 @@ The repository is organised into three main branches:
 - **backend**: Contains the code for the backend.
 
 ## Tech Stack
-Backend: 
-Frontend: 
-Database: 
+- **Backend**: 
+- **Frontend**: 
+- **Database**: 
 
 ## Features
-- Feature 1: Read C++ Source File
-- Feature 2: Compile & Error Checking
-- Feature 3: LLM-Based Code Review
+- **Feature 1**: Read C++ Source File
+- **Feature 2**: Compile & Error Checking
+- **Feature 3**: LLM-Based Code Review
 
 ## Installation
