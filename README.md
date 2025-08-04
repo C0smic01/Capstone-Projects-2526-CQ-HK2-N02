@@ -2,7 +2,7 @@
 This repo contains the source code and all materials for Capstone Projects(CSC10204)
 
 ## Overview
-This project is a simple Python web application that uses LangChain and LLMs to assist in evaluating C++ programming assignments. It can understand a problem statement, read a submitted C++ file, compile it, and—if successful—use an LLM to provide feedback on code quality and logic.
+This project is a simple Python web application that uses LangChain and LLMs to assist in evaluating C++ programming assignments. It can understand a problem statement, read a submitted C++ file, compile it, and if successful, use an LLM to provide feedback on code quality and logic.
 
 ## Repository Structure
 The repository is organised into three main branches:
