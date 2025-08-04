@@ -7,8 +7,8 @@ This project is a simple Python web application that uses LangChain and LLMs to 
 ## Repository Structure
 The repository is organised into three main branches:
 - **main**: The production-ready branch with the latest stable version of both frontend and backend.
-- **frontend**: Contains the code for the frontend.
-- **backend**: Contains the code for the backend.
+- **frontend**: Contains the code for the frontend, built with
+- **backend**: Contains the code for the backend, built with
 
 ## Tech Stack
 - **Backend**: 
