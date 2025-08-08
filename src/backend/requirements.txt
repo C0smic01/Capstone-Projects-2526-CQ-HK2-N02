@@ -4,5 +4,7 @@ python-dotenv
 langchain
 langchain-google-genai
 langchain-openai
+langchain-groq
 google-generativeai
 openai
+groq

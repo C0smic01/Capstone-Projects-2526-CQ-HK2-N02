@@ -2,13 +2,15 @@ from typing import Dict, Type
 from app.services.base_ai_service import BaseAIService
 from app.services.gemini_service_v2 import GeminiService
 from app.services.openai_service import OpenAIService
+from app.services.groq_service import GroqService
 
 class AIServiceFactory:
     """Factory class for creating AI service instances."""
     
     _services: Dict[str, Type[BaseAIService]] = {
         "gemini": GeminiService,
-        "openai": OpenAIService
+        "openai": OpenAIService,
+        "groq": GroqService
     }
     
     _instances: Dict[str, BaseAIService] = {}
