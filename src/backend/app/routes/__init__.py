@@ -1,9 +1,10 @@
 from flask import jsonify, request
 from app.services.file_service import allowed_file, save_file
-from app.services.gemini_service import get_gemini_service
+from app.services.ai_service_factory import AIServiceFactory
 from app.utils.json_response import json_response
 from app.utils.error_codes import ERROR_CODES
 from app.constants.filenames import PROBLEM_FILENAME, SOLUTION_FILENAME
+from app.config import Config
 import os
 
 def register_routes(app):
@@ -12,6 +13,26 @@ def register_routes(app):
     @app.route('/')
     def hello():
         return jsonify({"message": "Welcome to Code Mystic API"})
+    
+    @app.route('/api/services', methods=['GET'])
+    def get_available_services():
+        """Get list of available AI services."""
+        try:
+            services = AIServiceFactory.get_available_services()
+            return jsonify(json_response(
+                status="success",
+                message="Available AI services retrieved successfully.",
+                data={
+                    "services": services,
+                    "default_service": Config.DEFAULT_AI_SERVICE
+                }
+            )), 200
+        except Exception as e:
+            return jsonify(json_response(
+                status="fail",
+                code=ERROR_CODES["UNKNOWN_ERROR"],
+                message=f"Failed to get available services: {str(e)}"
+            )), 500
     
     @app.route('/api/upload', methods=['POST'])
     def upload_files():
@@ -117,15 +138,16 @@ def register_routes(app):
                 )), 500
             
             try:
-                # Get Gemini service instance
-                gemini_service = get_gemini_service()
+                # Get AI service instance (support both Gemini and OpenAI)
+                ai_service_name = request.form.get('ai_service', Config.DEFAULT_AI_SERVICE)
+                ai_service = AIServiceFactory.get_service(ai_service_name)
                 
                 # Read file contents
-                problem_content = gemini_service.read_file_content(problem_path)
-                solution_content = gemini_service.read_file_content(solution_path)
+                problem_content = ai_service.read_file_content(problem_path)
+                solution_content = ai_service.read_file_content(solution_path)
                 
-                # Analyze with Gemini AI
-                analysis_result = gemini_service.analyze_code(problem_content, solution_content)
+                # Analyze with AI service
+                analysis_result = ai_service.analyze_code(problem_content, solution_content)
                 
                 # Clean up temporary files
                 try:
@@ -134,20 +156,17 @@ def register_routes(app):
                 except:
                     pass  # Ignore file cleanup errors
                 
-                # Success response with structured data
-                return jsonify(json_response(
-                    status="success",
-                    message="Code analysis completed successfully.",
-                    data={
-                        "analysis": analysis_result.to_dict(),
-                        "metadata": {
-                            "problem_filename": problem_file.filename,
-                            "solution_filename": solution_file.filename,
-                            "analysis_timestamp": str(__import__('datetime').datetime.now()),
-                            "model_used": "gemini-1.5-flash"
-                        }
-                    }
-                )), 200
+                # Success response with simplified structure
+                response_data = {
+                    "status": "success",
+                    "message": "Code analysis completed successfully.",
+                    "model_used": ai_service.get_model_name(),
+                    "complexity": analysis_result.complexity,
+                    "errors": analysis_result.errors,
+                    "execution_time": analysis_result.execution_time,
+                    "improvements": analysis_result.improvements
+                }
+                return jsonify(response_data), 200
                 
             except Exception as analysis_error:
                 # Clean up files on error

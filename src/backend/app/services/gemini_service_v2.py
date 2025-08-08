@@ -3,19 +3,21 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
-import os
+from app.services.base_ai_service import BaseAIService
 
-class GeminiService:
-    """Service for interacting with Google Gemini AI using LangChain."""
+class GeminiService(BaseAIService):
+    """Gemini AI service implementation."""
     
     def __init__(self):
-        """Initialize the Gemini service with API key."""
+        super().__init__()
         if not Config.GOOGLE_API_KEY:
             raise ValueError("GOOGLE_API_KEY is not set in environment variables")
         
+        self.model_name = "gemini-1.5-flash"
+        
         # Initialize Gemini LLM
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model=self.model_name,
             google_api_key=Config.GOOGLE_API_KEY,
             temperature=0.3
         )
@@ -60,19 +62,9 @@ Trả lời ngắn gọn, súc tích bằng tiếng Việt.
             verbose=False
         )
     
-    def analyze_code(self, problem_text, solution_code):
-        """
-        Analyze problem and solution code using Gemini AI.
-        
-        Args:
-            problem_text (str): The problem statement
-            solution_code (str): The solution code
-            
-        Returns:
-            AnalysisResult: Structured analysis result
-        """
+    def analyze_code(self, problem_text: str, solution_code: str) -> AnalysisResult:
+        """Analyze code using Gemini AI."""
         try:
-            # Use invoke instead of deprecated run method
             response = self.chain.invoke({
                 "problem_text": problem_text,
                 "solution_code": solution_code
@@ -93,9 +85,8 @@ Trả lời ngắn gọn, súc tích bằng tiếng Việt.
             # Parse the text response into structured data
             analysis_result = AnalysisResult.from_text(analysis_text)
             
-            # If parsing fails, create a basic result with fallback values
+            # Fallback if parsing fails
             if not analysis_result.improvements and not analysis_result.complexity:
-                # Simple fallback parsing
                 analysis_result.is_correct = "sai" not in analysis_text.lower() and "error" not in analysis_text.lower()
                 analysis_result.improvements = "Cần phân tích thêm để đưa ra đề xuất cải thiện"
                 analysis_result.errors = "Chưa phát hiện lỗi rõ ràng" if analysis_result.is_correct else "Có thể có lỗi trong logic"
@@ -107,32 +98,6 @@ Trả lời ngắn gọn, súc tích bằng tiếng Việt.
         except Exception as e:
             raise Exception(f"Gemini AI analysis failed: {str(e)}")
     
-    def read_file_content(self, file_path):
-        """
-        Read content from file.
-        
-        Args:
-            file_path (str): Path to the file
-            
-        Returns:
-            str: File content
-        """
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                return file.read()
-        except UnicodeDecodeError:
-            # Try with different encoding if utf-8 fails
-            with open(file_path, 'r', encoding='latin-1') as file:
-                return file.read()
-        except Exception as e:
-            raise Exception(f"Error reading file {file_path}: {str(e)}")
-
-# Global instance - initialize only when needed
-gemini_service = None
-
-def get_gemini_service():
-    """Get or create Gemini service instance."""
-    global gemini_service
-    if gemini_service is None:
-        gemini_service = GeminiService()
-    return gemini_service
+    def get_model_name(self) -> str:
+        """Get the model name."""
+        return self.model_name
