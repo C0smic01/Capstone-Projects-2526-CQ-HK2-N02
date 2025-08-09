@@ -1,5 +1,3 @@
-import '../../index.css'
-import React from 'react'
 import { Brain } from 'lucide-react';
 import { Header } from '../components/Header';
 import { InputSection } from '../components/InputSection';
