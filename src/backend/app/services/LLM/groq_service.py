@@ -1,34 +1,30 @@
-from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
 from app.services.LLM.base_ai_service import BaseAIService
+from app.services.LLM.llm_factory import GroqLLMFactory
 import os
 
 class GroqService(BaseAIService):
     """Groq AI service implementation."""
     
     def __init__(self):
-        super().__init__()
-        
         # Get API key from environment
         groq_api_key = os.getenv('GROQ_API_KEY')
         if not groq_api_key:
             raise ValueError("GROQ_API_KEY is not set in environment variables")
         
-        self.model_name = "llama-3.1-8b-instant"  # Fast and accurate Groq model
-        # Alternative models: "mixtral-8x7b-32768", "llama-3.1-70b-versatile"
-        
-        # Initialize Groq LLM
-        self.llm = ChatGroq(
-            model=self.model_name,
-            groq_api_key=groq_api_key,
+        # Create LLM factory and initialize base service
+        llm_factory = GroqLLMFactory(
+            api_key=groq_api_key,
+            model_name="llama-3.1-8b-instant",
             temperature=0.3
         )
-        
-        # Create prompt template for code review
-        self.prompt_template = PromptTemplate(
+        super().__init__(llm_factory)
+    
+    def _create_prompt_template(self) -> PromptTemplate:
+        """Create the prompt template for Groq service."""
+        return PromptTemplate(
             input_variables=["problem_text", "solution_code"],
             template="""
 Bạn là chuyên gia phân tích code C++. Hãy phân tích đề bài và code sau:
@@ -44,13 +40,6 @@ IMPROVEMENTS: [Gợi ý cải thiện cụ thể - tối đa 2 câu, hoặc "Kh�
 
 Chỉ trả lời theo format trên, không thêm markdown hay ký tự đặc biệt.
             """
-        )
-        
-        # Create LLM chain
-        self.chain = LLMChain(
-            llm=self.llm,
-            prompt=self.prompt_template,
-            verbose=False
         )
     
     def _parse_groq_response(self, text: str) -> AnalysisResult:
@@ -118,7 +107,3 @@ Chỉ trả lời theo format trên, không thêm markdown hay ký tự đặc b
                 
         except Exception as e:
             raise Exception(f"Groq AI analysis failed: {str(e)}")
-    
-    def get_model_name(self) -> str:
-        """Get the model name."""
-        return self.model_name

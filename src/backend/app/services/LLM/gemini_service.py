@@ -1,29 +1,27 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
 from app.services.LLM.base_ai_service import BaseAIService
+from app.services.LLM.llm_factory import GeminiLLMFactory
 
 class GeminiService(BaseAIService):
     """Gemini AI service implementation."""
     
     def __init__(self):
-        super().__init__()
         if not Config.GOOGLE_API_KEY:
             raise ValueError("GOOGLE_API_KEY is not set in environment variables")
         
-        self.model_name = "gemini-1.5-flash"
-        
-        # Initialize Gemini LLM
-        self.llm = ChatGoogleGenerativeAI(
-            model=self.model_name,
-            google_api_key=Config.GOOGLE_API_KEY,
+        # Create LLM factory and initialize base service
+        llm_factory = GeminiLLMFactory(
+            api_key=Config.GOOGLE_API_KEY,
+            model_name="gemini-1.5-flash",
             temperature=0.3
         )
-        
-        # Create simple prompt template for code review
-        self.prompt_template = PromptTemplate(
+        super().__init__(llm_factory)
+    
+    def _create_prompt_template(self) -> PromptTemplate:
+        """Create the prompt template for Gemini service."""
+        return PromptTemplate(
             input_variables=["problem_text", "solution_code"],
             template="""
 Phân tích code C++ sau và chỉ trả về 3 thông tin chính:
@@ -47,13 +45,6 @@ Trả lời theo format sau:
 
 Trả lời ngắn gọn, chính xác bằng tiếng Việt.
             """
-        )
-        
-        # Create LLM chain
-        self.chain = LLMChain(
-            llm=self.llm,
-            prompt=self.prompt_template,
-            verbose=False
         )
     
     def analyze_code(self, problem_text: str, solution_code: str) -> AnalysisResult:
@@ -89,7 +80,3 @@ Trả lời ngắn gọn, chính xác bằng tiếng Việt.
                 
         except Exception as e:
             raise Exception(f"Gemini AI analysis failed: {str(e)}")
-    
-    def get_model_name(self) -> str:
-        """Get the model name."""
-        return self.model_name

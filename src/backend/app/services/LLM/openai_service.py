@@ -1,33 +1,30 @@
-from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
 from app.services.LLM.base_ai_service import BaseAIService
+from app.services.LLM.llm_factory import OpenAILLMFactory
 import os
 
 class OpenAIService(BaseAIService):
     """OpenAI service implementation."""
     
     def __init__(self):
-        super().__init__()
-        
         # Get API key from environment
         openai_api_key = os.getenv('OPENAI_API_KEY')
         if not openai_api_key:
             raise ValueError("OPENAI_API_KEY is not set in environment variables")
         
-        self.model_name = "gpt-3.5-turbo"
-        
-        # Initialize OpenAI LLM
-        self.llm = ChatOpenAI(
-            model=self.model_name,
-            openai_api_key=openai_api_key,
+        # Create LLM factory and initialize base service
+        llm_factory = OpenAILLMFactory(
+            api_key=openai_api_key,
+            model_name="gpt-3.5-turbo",
             temperature=0.3
         )
-        
-        # Create prompt template for code review
-        self.prompt_template = PromptTemplate(
+        super().__init__(llm_factory)
+    
+    def _create_prompt_template(self) -> PromptTemplate:
+        """Create the prompt template for OpenAI service."""
+        return PromptTemplate(
             input_variables=["problem_text", "solution_code"],
             template="""
 Analyze the C++ code and provide only 3 key insights:
@@ -51,13 +48,6 @@ Specific optimization suggestions to improve the code (if any)
 
 Respond concisely in Vietnamese.
             """
-        )
-        
-        # Create LLM chain
-        self.chain = LLMChain(
-            llm=self.llm,
-            prompt=self.prompt_template,
-            verbose=False
         )
     
     def analyze_code(self, problem_text: str, solution_code: str) -> AnalysisResult:
@@ -93,7 +83,3 @@ Respond concisely in Vietnamese.
                 
         except Exception as e:
             raise Exception(f"OpenAI analysis failed: {str(e)}")
-    
-    def get_model_name(self) -> str:
-        """Get the model name."""
-        return self.model_name

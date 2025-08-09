@@ -5,8 +5,6 @@ from app.services.LLM.openai_service import OpenAIService
 from app.services.LLM.groq_service import GroqService
 
 class AIServiceFactory:
-    """Factory class for creating AI service instances."""
-    
     _services: Dict[str, Type[BaseAIService]] = {
         "gemini": GeminiService,
         "openai": OpenAIService,
@@ -19,10 +17,8 @@ class AIServiceFactory:
     def get_service(cls, service_name: str = "gemini") -> BaseAIService:
         """
         Get AI service instance.
-        
         Args:
             service_name (str): Name of the service ('gemini' or 'openai')
-            
         Returns:
             BaseAIService: AI service instance
         """
