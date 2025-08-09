@@ -26,19 +26,20 @@ const HomePage: React.FC = () => {
   } = useCppAnalyzer();
 
   return (
-    <div className={`min-h-screen ${themeColors.classes.bgGradient} text-white`}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white">
+
 
       {/* Header */}
-      <Header theme={theme} themeColors={themeColors} />
+      <Header />
 
       <div className="container mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-1 gap-8">
 
           {/* Banner */}
           {!analysisResult && (
-            <div className={`bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-${theme.primary}-500/10 text-center`}>
-              <Brain className={`w-16 h-16 mx-auto mb-4 text-${theme.primary}-400/50`} />
-              <p className={`text-${theme.primary}-300/60`}>
+            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-cyan-500/10 text-center">
+              <Brain className="w-16 h-16 mx-auto mb-4 text-cyan-400/50" />
+              <p className="text-cyan-300/60">
                 Tải lên file C++ và nhập mô tả bài toán để bắt đầu phân tích
               </p>
             </div>
@@ -46,8 +47,6 @@ const HomePage: React.FC = () => {
 
           {/* Input Section */}
           <InputSection
-            theme={theme}
-            themeColors={themeColors}
             problemDescription={problemDescription}
             setProblemDescription={setProblemDescription}
             file={file}
@@ -59,7 +58,7 @@ const HomePage: React.FC = () => {
 
           {/* Results Section */}
           <div className="space-y-6">
-            
+
             {/* Error Card */}
             {error && <ErrorCard message={error} />}
 
@@ -73,7 +72,7 @@ const HomePage: React.FC = () => {
 
                 {/* LLM Review */}
                 {analysisResult.llmReview && (
-                  <LLMReviewCard review={analysisResult.llmReview} themeColors={themeColors} />
+                  <LLMReviewCard review={analysisResult.llmReview} />
                 )}
               </>
             )}

@@ -1,27 +1,18 @@
 import React from 'react';
 import { Brain } from 'lucide-react';
 
-interface ThemeColors {
-  classes: {
-    border: string;
-    icon: string;
-    accent: string;
-  };
-}
-
 interface LLMReviewCardProps {
-  review: string;
-  themeColors: ThemeColors;
+  review: string
 }
 
-const LLMReviewCard: React.FC<LLMReviewCardProps> = ({ review, themeColors }) => {
+const LLMReviewCard: React.FC<LLMReviewCardProps> = ({ review }) => {
   return (
-    <div className={`bg-black/30 backdrop-blur-sm rounded-2xl p-6 border ${themeColors.classes.border}`}>
+    <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20">
       <h3 className="text-lg font-semibold mb-3 flex items-center space-x-2">
-        <Brain className={themeColors.classes.icon} />
+        <Brain className="text-cyan-400" />
         <span>Nhận xét từ AI</span>
       </h3>
-      <div className={`${themeColors.classes.accent} whitespace-pre-wrap`}>
+      <div className="text-cyan-200 whitespace-pre-wrap">
         {review}
       </div>
     </div>

@@ -1,10 +1,7 @@
 import React, { useRef } from "react";
 import { FileText, Upload, Zap, Brain } from "lucide-react";
-import type { Theme, ThemeColors } from '../../assets/theme';
 
 interface InputFormProps {
-  theme: Theme;
-  themeColors: ThemeColors;
   problemDescription: string;
   setProblemDescription: (value: string) => void;
   file: File | null;
@@ -15,8 +12,6 @@ interface InputFormProps {
 }
 
 export const InputSection: React.FC<InputFormProps> = ({
-  theme,
-  themeColors,
   problemDescription,
   setProblemDescription,
   file,
@@ -31,35 +26,35 @@ export const InputSection: React.FC<InputFormProps> = ({
     <div className="space-y-6">
 
       {/* Mô tả bài toán */}
-      <div className={`bg-black/30 backdrop-blur-sm rounded-2xl p-6 border ${themeColors.classes.border}`}>
+      <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20">
         <h2 className="text-xl font-semibold mb-4 flex items-center space-x-2">
-          <FileText className={themeColors.classes.icon} />
+          <FileText className="text-cyan-400" />
           <span>Mô tả bài toán</span>
         </h2>
         <textarea
           value={problemDescription}
           onChange={(e) => setProblemDescription(e.target.value)}
           placeholder="Nhập mô tả đề bài tập cần giải..."
-          className={`w-full h-32 bg-slate-800/50 border border-${theme.primary}-500/30 rounded-xl px-4 py-3 text-white placeholder-${theme.primary}-300/50 focus:outline-none focus:border-${theme.primary}-400 focus:ring-2 focus:ring-${theme.primary}-400/20 transition-all`}
+          className="w-full h-32 bg-slate-800/50 border border-cyan-500/30 rounded-xl px-4 py-3 text-white placeholder-cyan-300/50 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
         />
       </div>
 
       {/* Upload file */}
-      <div className={`bg-black/30 backdrop-blur-sm rounded-2xl p-6 border ${themeColors.classes.border}`}>
+      <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20">
         <h2 className="text-xl font-semibold mb-4 flex items-center space-x-2">
-          <Upload className={themeColors.classes.icon} />
+          <Upload className="text-cyan-400" />
           <span>Upload file C++</span>
         </h2>
 
         <div
-          className={`border-2 border-dashed border-${theme.primary}-500/30 rounded-xl p-8 text-center hover:border-${theme.primary}-400/50 transition-all cursor-pointer`}
+          className="border-2 border-dashed border-cyan-500/30 rounded-xl p-8 text-center hover:border-cyan-400/50 transition-all cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
         >
-          <Upload className={`w-12 h-12 mx-auto mb-4 ${themeColors.classes.icon}`} />
-          <p className={themeColors.classes.text}>
+          <Upload className="w-12 h-12 mx-auto mb-4 text-cyan-400" />
+          <p className="text-cyan-300">
             {file ? file.name : "Chọn file .cpp để phân tích"}
           </p>
-          <p className={`text-${theme.primary}-400/60 text-sm mt-2`}>
+          <p className="text-cyan-400/60 text-sm mt-2">
             Kéo thả file hoặc click để chọn
           </p>
         </div>
@@ -74,9 +69,9 @@ export const InputSection: React.FC<InputFormProps> = ({
 
         {fileContent && (
           <div className="mt-4">
-            <h3 className={`text-sm font-medium ${themeColors.classes.text} mb-2`}>Preview:</h3>
+            <h3 className="text-sm font-medium text-cyan-300 mb-2">Preview:</h3>
             <div className="bg-slate-800/50 rounded-lg p-4 max-h-48 overflow-y-auto">
-              <pre className={`text-xs text-${theme.primary}-100 whitespace-pre-wrap`}>
+              <pre className="text-xs text-cyan-100 whitespace-pre-wrap">
                 {fileContent.substring(0, 500)}
                 {fileContent.length > 500 && "..."}
               </pre>
@@ -89,7 +84,7 @@ export const InputSection: React.FC<InputFormProps> = ({
       <button
         onClick={analyzeCode}
         disabled={!file || !problemDescription.trim() || isAnalyzing}
-        className={`w-full ${themeColors.classes.button} ${themeColors.classes.buttonHover} disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all flex items-center justify-center space-x-2 transform hover:scale-[1.02] disabled:hover:scale-100`}
+        className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all flex items-center justify-center space-x-2 transform hover:scale-[1.02] disabled:hover:scale-100"
       >
         {isAnalyzing ? (
           <>
