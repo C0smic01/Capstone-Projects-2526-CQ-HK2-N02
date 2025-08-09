@@ -1,8 +1,8 @@
 from typing import Dict, Type
-from app.services.base_ai_service import BaseAIService
-from app.services.gemini_service_v2 import GeminiService
-from app.services.openai_service import OpenAIService
-from app.services.groq_service import GroqService
+from app.services.LLM.base_ai_service import BaseAIService
+from app.services.LLM.gemini_service import GeminiService
+from app.services.LLM.openai_service import OpenAIService
+from app.services.LLM.groq_service import GroqService
 
 class AIServiceFactory:
     """Factory class for creating AI service instances."""

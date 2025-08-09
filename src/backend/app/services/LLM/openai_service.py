@@ -1,57 +1,55 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
-from app.services.base_ai_service import BaseAIService
+from app.services.LLM.base_ai_service import BaseAIService
+import os
 
-class GeminiService(BaseAIService):
-    """Gemini AI service implementation."""
+class OpenAIService(BaseAIService):
+    """OpenAI service implementation."""
     
     def __init__(self):
         super().__init__()
-        if not Config.GOOGLE_API_KEY:
-            raise ValueError("GOOGLE_API_KEY is not set in environment variables")
         
-        self.model_name = "gemini-1.5-flash"
+        # Get API key from environment
+        openai_api_key = os.getenv('OPENAI_API_KEY')
+        if not openai_api_key:
+            raise ValueError("OPENAI_API_KEY is not set in environment variables")
         
-        # Initialize Gemini LLM
-        self.llm = ChatGoogleGenerativeAI(
+        self.model_name = "gpt-3.5-turbo"
+        
+        # Initialize OpenAI LLM
+        self.llm = ChatOpenAI(
             model=self.model_name,
-            google_api_key=Config.GOOGLE_API_KEY,
+            openai_api_key=openai_api_key,
             temperature=0.3
         )
         
-        # Create simple prompt template for code review
+        # Create prompt template for code review
         self.prompt_template = PromptTemplate(
             input_variables=["problem_text", "solution_code"],
             template="""
-Phân tích đề bài và code sau một cách ngắn gọn:
+Analyze the C++ code and provide only 3 key insights:
 
-ĐỀ BÀI:
+PROBLEM STATEMENT:
 {problem_text}
 
-CODE GIẢI PHÁP:
+SOLUTION CODE:
 {solution_code}
 
-Hãy đưa ra nhận xét theo format sau:
+Please respond in the following format:
 
-## TÍNH ĐÚNG ĐẮN
-Code có giải quyết đúng bài toán không? (Đúng/Sai và lý do ngắn gọn)
+## COMPLEXITY
+Time and space complexity in Big O notation (e.g., Time: O(n), Space: O(1))
 
-## LỖI VÀ VẤN ĐỀ  
-Các lỗi logic, syntax, hoặc vấn đề trong code (nếu có)
+## PERFORMANCE  
+Performance assessment and execution speed evaluation (good/average/slow with reasoning)
 
-## CẢI TIẾN
-Đề xuất cải thiện code (tối ưu thuật toán, sửa lỗi, thêm tính năng)
+## IMPROVEMENTS
+Specific optimization suggestions to improve the code (if any)
 
-## ĐỘ PHỨC TẠP
-Độ phức tạp thời gian và không gian (dạng O notation)
-
-## THỜI GIAN THỰC THI
-Đánh giá hiệu suất và thời gian chạy của thuật toán
-
-Trả lời ngắn gọn, súc tích bằng tiếng Việt.
+Respond concisely in Vietnamese.
             """
         )
         
@@ -63,7 +61,7 @@ Trả lời ngắn gọn, súc tích bằng tiếng Việt.
         )
     
     def analyze_code(self, problem_text: str, solution_code: str) -> AnalysisResult:
-        """Analyze code using Gemini AI."""
+        """Analyze code using OpenAI."""
         try:
             response = self.chain.invoke({
                 "problem_text": problem_text,
@@ -87,16 +85,14 @@ Trả lời ngắn gọn, súc tích bằng tiếng Việt.
             
             # Fallback if parsing fails
             if not analysis_result.improvements and not analysis_result.complexity:
-                analysis_result.is_correct = "sai" not in analysis_text.lower() and "error" not in analysis_text.lower()
                 analysis_result.improvements = "Cần phân tích thêm để đưa ra đề xuất cải thiện"
-                analysis_result.errors = "Chưa phát hiện lỗi rõ ràng" if analysis_result.is_correct else "Có thể có lỗi trong logic"
                 analysis_result.complexity = "Cần phân tích thêm"
                 analysis_result.execution_time = "Chưa đánh giá"
             
             return analysis_result
                 
         except Exception as e:
-            raise Exception(f"Gemini AI analysis failed: {str(e)}")
+            raise Exception(f"OpenAI analysis failed: {str(e)}")
     
     def get_model_name(self) -> str:
         """Get the model name."""

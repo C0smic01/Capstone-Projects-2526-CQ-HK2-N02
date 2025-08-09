@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from app.services.file_service import allowed_file, save_file
-from app.services.ai_service_factory import AIServiceFactory
+from app.services.LLM.ai_service_factory import AIServiceFactory
 from app.utils.json_response import json_response
 from app.utils.error_codes import ERROR_CODES
 from app.constants.filenames import PROBLEM_FILENAME, SOLUTION_FILENAME
@@ -159,12 +159,12 @@ def register_routes(app):
                 # Success response with simplified structure
                 response_data = {
                     "status": "success",
-                    "message": "Code analysis completed successfully.",
-                    "model_used": ai_service.get_model_name(),
-                    "complexity": analysis_result.complexity,
-                    "errors": analysis_result.errors,
-                    "execution_time": analysis_result.execution_time,
-                    "improvements": analysis_result.improvements
+                    "message": "Phân tích code thành công.",
+                    "data": {
+                        "complexity": analysis_result.complexity,
+                        "performance": analysis_result.execution_time,
+                        "improvements": analysis_result.improvements if analysis_result.improvements and analysis_result.improvements != "Không có đề xuất cải thiện" else None
+                    }
                 }
                 return jsonify(response_data), 200
                 

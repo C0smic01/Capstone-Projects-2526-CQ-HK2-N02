@@ -3,7 +3,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
-from app.services.base_ai_service import BaseAIService
+from app.services.LLM.base_ai_service import BaseAIService
 import os
 
 class GroqService(BaseAIService):
@@ -38,11 +38,9 @@ CODE: {solution_code}
 
 Trả lời NGẮN GỌN theo format:
 
-CORRECTNESS: [Đúng/Sai - 1 câu giải thích]
-ERRORS: [Mô tả lỗi hoặc "Không có lỗi"]
-IMPROVEMENTS: [Gợi ý cải thiện - tối đa 2 câu]
 COMPLEXITY: [Thời gian: O(x), Không gian: O(y)]
-EXECUTION: [Đánh giá hiệu suất - 1 câu ngắn]
+PERFORMANCE: [Đánh giá hiệu suất - tốt/trung bình/chậm và lý do]
+IMPROVEMENTS: [Gợi ý cải thiện cụ thể - tối đa 2 câu, hoặc "Không cần cải thiện"]
 
 Chỉ trả lời theo format trên, không thêm markdown hay ký tự đặc biệt.
             """
@@ -69,35 +67,28 @@ Chỉ trả lời theo format trên, không thêm markdown hay ký tự đặc b
                 continue
                 
             # Parse each field
-            if line.startswith('CORRECTNESS:'):
-                content = line.replace('CORRECTNESS:', '').strip()
-                result.is_correct = content.lower().startswith('đúng')
-                
-            elif line.startswith('ERRORS:'):
-                content = line.replace('ERRORS:', '').strip()
-                result.errors = content if content != "Không có lỗi" else "Không phát hiện lỗi"
-                
-            elif line.startswith('IMPROVEMENTS:'):
-                content = line.replace('IMPROVEMENTS:', '').strip()
-                result.improvements = content
-                
-            elif line.startswith('COMPLEXITY:'):
+            if line.startswith('COMPLEXITY:'):
                 content = line.replace('COMPLEXITY:', '').strip()
                 result.complexity = content
                 
-            elif line.startswith('EXECUTION:'):
-                content = line.replace('EXECUTION:', '').strip()
+            elif line.startswith('PERFORMANCE:'):
+                content = line.replace('PERFORMANCE:', '').strip()
                 result.execution_time = content
+                
+            elif line.startswith('IMPROVEMENTS:'):
+                content = line.replace('IMPROVEMENTS:', '').strip()
+                if content.lower() != "không cần cải thiện":
+                    result.improvements = content
+                else:
+                    result.improvements = None
         
         # Set defaults if parsing failed
-        if not result.errors:
-            result.errors = "Không phát hiện lỗi rõ ràng"
-        if not result.improvements:
-            result.improvements = "Cần phân tích thêm"
         if not result.complexity:
             result.complexity = "Chưa xác định"
         if not result.execution_time:
             result.execution_time = "Chưa đánh giá"
+        if not result.improvements:
+            result.improvements = "Không có đề xuất cải thiện"
             
         return result
     def analyze_code(self, problem_text: str, solution_code: str) -> AnalysisResult:

@@ -16,11 +16,9 @@ class AnalysisResult:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON response."""
         return {
-            "is_correct": self.is_correct,
-            "improvements": self.improvements,
-            "errors": self.errors,
             "complexity": self.complexity,
-            "execution_time": self.execution_time
+            "performance": self.execution_time,
+            "improvements": self.improvements if self.improvements != "Không có đề xuất cải thiện" else None
         }
     
     @classmethod
@@ -54,21 +52,17 @@ class AnalysisResult:
             title = lines[0].strip().upper()
             content = lines[1].strip()
             
-            # Parse different sections
+            # Parse different sections - focus on key metrics
             if any(keyword in title for keyword in ["PHỨC TẠP", "COMPLEXITY", "ĐỘ PHỨC TẠP"]):
                 result._parse_complexity(content)
-            elif any(keyword in title for keyword in ["CẢI TIẾN", "IMPROVEMENT", "CÁCH TIẾN", "TỐI ƯU"]):
+            elif any(keyword in title for keyword in ["CẢI TIẾN", "IMPROVEMENT", "CẢI THIỆN", "TỐI ƯU"]):
                 result.improvements = content
-            elif any(keyword in title for keyword in ["LỖI", "ERROR", "VẤN ĐỀ", "PROBLEM", "ĐIỂM YẾU"]):
-                result.errors = content
-            elif any(keyword in title for keyword in ["THỜI GIAN", "TIME", "HIỆU SUẤT"]):
+            elif any(keyword in title for keyword in ["THỜI GIAN", "TIME", "HIỆU SUẤT", "PERFORMANCE", "HIỆU NĂNG"]):
                 result.execution_time = content
         
         # Fallback: extract from full text if sections are not found
         if not result.improvements:
             result.improvements = result._extract_improvements(analysis_text)
-        if not result.errors:
-            result.errors = result._extract_errors(analysis_text)
         if not result.complexity:
             result.complexity = result._extract_complexity(analysis_text)
         if not result.execution_time:
@@ -128,11 +122,11 @@ class AnalysisResult:
         return "Chưa xác định được độ phức tạp"
     
     def _extract_time(self, text: str) -> str:
-        """Extract execution time information from text."""
+        """Extract performance information from text."""
         lines = text.split("\n")
         
         for line in lines:
-            if any(keyword in line.lower() for keyword in ["thời gian", "time", "nhanh", "chậm", "hiệu suất"]):
+            if any(keyword in line.lower() for keyword in ["thời gian", "time", "nhanh", "chậm", "hiệu suất", "performance", "hiệu năng", "tốt", "kém"]):
                 return line.strip()
         
-        return "Chưa có thông tin về thời gian thực thi"
+        return "Chưa có thông tin về hiệu năng"

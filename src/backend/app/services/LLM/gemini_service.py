@@ -1,61 +1,51 @@
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from app.config import Config
 from app.models.analysis_result import AnalysisResult
-from app.services.base_ai_service import BaseAIService
-import os
+from app.services.LLM.base_ai_service import BaseAIService
 
-class OpenAIService(BaseAIService):
-    """OpenAI service implementation."""
+class GeminiService(BaseAIService):
+    """Gemini AI service implementation."""
     
     def __init__(self):
         super().__init__()
+        if not Config.GOOGLE_API_KEY:
+            raise ValueError("GOOGLE_API_KEY is not set in environment variables")
         
-        # Get API key from environment
-        openai_api_key = os.getenv('OPENAI_API_KEY')
-        if not openai_api_key:
-            raise ValueError("OPENAI_API_KEY is not set in environment variables")
+        self.model_name = "gemini-1.5-flash"
         
-        self.model_name = "gpt-3.5-turbo"
-        
-        # Initialize OpenAI LLM
-        self.llm = ChatOpenAI(
+        # Initialize Gemini LLM
+        self.llm = ChatGoogleGenerativeAI(
             model=self.model_name,
-            openai_api_key=openai_api_key,
+            google_api_key=Config.GOOGLE_API_KEY,
             temperature=0.3
         )
         
-        # Create prompt template for code review
+        # Create simple prompt template for code review
         self.prompt_template = PromptTemplate(
             input_variables=["problem_text", "solution_code"],
             template="""
-Analyze the following problem statement and solution code concisely:
+Phân tích code C++ sau và chỉ trả về 3 thông tin chính:
 
-PROBLEM STATEMENT:
+ĐỀ BÀI:
 {problem_text}
 
-SOLUTION CODE:
+CODE:
 {solution_code}
 
-Please provide analysis in the following format:
+Trả lời theo format sau:
 
-## CORRECTNESS
-Does the code solve the problem correctly? (Correct/Incorrect with brief reasoning)
+## ĐỘ PHỨC TẠP
+Độ phức tạp thời gian và không gian theo Big O notation (ví dụ: Thời gian: O(n), Không gian: O(1))
 
-## ERRORS AND ISSUES
-Any logic, syntax, or other issues in the code (if any)
+## HIỆU NĂNG
+Đánh giá hiệu suất và tốc độ thực thi của thuật toán (tốt/trung bình/chậm và lý do)
 
-## IMPROVEMENTS
-Suggestions to improve the code (algorithm optimization, bug fixes, additional features)
+## CẢI THIỆN
+Đề xuất cải thiện cụ thể để tối ưu hóa code (nếu có)
 
-## COMPLEXITY
-Time and space complexity (O notation format)
-
-## EXECUTION TIME
-Performance assessment and runtime evaluation of the algorithm
-
-Respond concisely in Vietnamese.
+Trả lời ngắn gọn, chính xác bằng tiếng Việt.
             """
         )
         
@@ -67,7 +57,7 @@ Respond concisely in Vietnamese.
         )
     
     def analyze_code(self, problem_text: str, solution_code: str) -> AnalysisResult:
-        """Analyze code using OpenAI."""
+        """Analyze code using Gemini AI."""
         try:
             response = self.chain.invoke({
                 "problem_text": problem_text,
@@ -91,16 +81,14 @@ Respond concisely in Vietnamese.
             
             # Fallback if parsing fails
             if not analysis_result.improvements and not analysis_result.complexity:
-                analysis_result.is_correct = "sai" not in analysis_text.lower() and "error" not in analysis_text.lower()
                 analysis_result.improvements = "Cần phân tích thêm để đưa ra đề xuất cải thiện"
-                analysis_result.errors = "Chưa phát hiện lỗi rõ ràng" if analysis_result.is_correct else "Có thể có lỗi trong logic"
                 analysis_result.complexity = "Cần phân tích thêm"
                 analysis_result.execution_time = "Chưa đánh giá"
             
             return analysis_result
                 
         except Exception as e:
-            raise Exception(f"OpenAI analysis failed: {str(e)}")
+            raise Exception(f"Gemini AI analysis failed: {str(e)}")
     
     def get_model_name(self) -> str:
         """Get the model name."""
