@@ -8,6 +8,20 @@ export interface Theme {
   icon?: string;
 }
 
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  classes: {
+    bgGradient: string;
+    border: string;
+    text: string;
+    button: string;
+    buttonHover: string;
+    icon: string;
+    accent: string;
+  };
+}
+
 export const themes: Record<string, Theme> = {
   // Theme xanh lá
   emerald: {
@@ -121,7 +135,7 @@ export const themes: Record<string, Theme> = {
 };
 
 // Helper function to get theme colors for CSS classes
-export const getThemeColors = (themeName: string) => {
+export const getThemeColors = (themeName: string): ThemeColors => {
   const theme = themes[themeName] || themes.emerald;
   
   return {
