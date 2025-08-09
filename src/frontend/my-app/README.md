@@ -83,7 +83,7 @@ Feel free to open an **Issue** or submit a **Pull Request** for improvements or 
 
 ## 📬 **Contact**
 
-**Authors:** Tun / Teng  
+**Authors:** Tuong Duong  
 **License:** MIT
 
 ---
