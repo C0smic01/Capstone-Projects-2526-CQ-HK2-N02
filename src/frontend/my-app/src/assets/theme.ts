@@ -8,6 +8,21 @@ export interface Theme {
   icon?: string;
 }
 
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  classes: {
+    bgGradient: string;
+    border: string;
+    text: string;
+    button: string;
+    buttonHover: string;
+    icon: string;
+    accent: string;
+  };
+}
+
+
 export const themes: Record<string, Theme> = {
   // Theme xanh lá
   emerald: {
