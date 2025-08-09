@@ -7,14 +7,19 @@ import CompilationStatusCard from '../components/CompilationStatusCard';
 import LLMReviewCard from '../components/LLMReviewCard';
 import ErrorCard from '../components/ErrorCard';
 import { useCppAnalyzer } from '../../business/hooks/CppAnalyzer';
-import type { Theme, ThemeColors } from '../../assets/theme';
 
-interface HomePageProps {
-  theme: Theme;
-  themeColors: ThemeColors;
-}
+// Import theme configuration
+import { themes, getThemeColors } from '../../assets/theme';
 
-const HomePage: React.FC<HomePageProps> = ({ theme, themeColors }) => {
+// ===== THEME CONFIGURATION =====
+// Thay đổi theme ở đây - chỉ cần đổi tên theme
+const SELECTED_THEME = 'blue'; // emerald, blue, purple, rose, orange, red, yellow, teal, sky, slate
+
+// Get theme configuration
+const theme = themes[SELECTED_THEME];
+const themeColors = getThemeColors(SELECTED_THEME);
+
+const HomePage: React.FC = () => {
 
   const {
     file, fileContent, problemDescription, setProblemDescription,
