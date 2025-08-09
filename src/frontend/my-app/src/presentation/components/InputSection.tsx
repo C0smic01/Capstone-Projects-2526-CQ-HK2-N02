@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { FileText, Upload, Zap, Brain } from "lucide-react";
 import type { Theme, ThemeColors } from '../../assets/theme';
 
-interface CodeAnalyzerFormProps {
+interface InputFormProps {
   theme: Theme;
   themeColors: ThemeColors;
   problemDescription: string;
@@ -14,7 +14,7 @@ interface CodeAnalyzerFormProps {
   isAnalyzing: boolean;
 }
 
-export const InputSection: React.FC<CodeAnalyzerFormProps> = ({
+export const InputSection: React.FC<InputFormProps> = ({
   theme,
   themeColors,
   problemDescription,

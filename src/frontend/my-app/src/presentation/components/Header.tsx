@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, themeColors }) => {
               <Brain className="w-6 h-6" />
             </div>
             <div>
-              <h1 className={`text-2xl font-bold bg-gradient-to-r from-${theme.primary}-400 to-${theme.secondary}-400 bg-clip-text text-transparent`}>
+              <h1 className={`text-2xl font-bold bg-gradient-to-r from-${theme.primary}-300 to-${theme.primary}-500 bg-clip-text text-transparent`}>
                 C++ Code Analyzer
               </h1>
               <p className={`${themeColors.classes.text}/70 text-sm`}>AI Agent với Langchain - {theme.icon} {theme.name}</p>
